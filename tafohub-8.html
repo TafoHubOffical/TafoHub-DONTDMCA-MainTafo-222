@@ -1,0 +1,845 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>TafoHub</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;600&family=Space+Grotesk:wght@400;600&family=Syne:wght@700&family=DM+Mono&family=Unbounded:wght@400;700&family=Instrument+Serif&family=Raleway:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--s:rgba(4,8,20,.95);--b:rgba(255,255,255,.07);--b2:rgba(255,255,255,.13);--th:52px;--accent:#7eb8f7;--uf:'Barlow',sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:100vw;height:100vh;font-family:var(--uf);color:#fff;overflow:hidden;background:#020810;user-select:none}
+#vbg{position:fixed;inset:0;z-index:0;pointer-events:none}
+#vbg video{width:100%;height:100%;object-fit:cover;opacity:.88;filter:contrast(1.12) saturate(1.25) brightness(1.05)}
+#vbg::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.08) 0%,rgba(0,0,0,0) 40%,rgba(0,0,0,.45) 100%)}
+body::after{content:'';position:fixed;inset:0;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:.45}
+@keyframes popIn{0%{opacity:0;transform:scale(.9) translateY(8px)}100%{opacity:1;transform:none}}
+@keyframes fadeIn{0%{opacity:0}100%{opacity:1}}
+@keyframes fadeOut{0%{opacity:1}100%{opacity:0}}
+@keyframes ripple{0%{transform:scale(0);opacity:.35}100%{transform:scale(3);opacity:0}}
+@keyframes calUp{0%{opacity:0;transform:translateY(10px) scale(.97)}100%{opacity:1;transform:none}}
+@keyframes tabIn{0%{opacity:0;transform:translateX(-5px)}100%{opacity:1;transform:none}}
+@keyframes winIn{0%{opacity:0;transform:scale(.93) translateY(14px)}100%{opacity:1;transform:none}}
+@keyframes cPop{0%{transform:scale(1)}40%{transform:scale(.88)}80%{transform:scale(1.06)}100%{transform:scale(1)}}
+@keyframes cardIn{0%{opacity:0;transform:translateY(18px)}100%{opacity:1;transform:none}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(126,184,247,.15)}50%{box-shadow:0 0 16px 4px rgba(126,184,247,.12)}}
+@keyframes ccGlow{0%,100%{text-shadow:0 0 18px rgba(126,184,247,.3),0 0 40px rgba(100,160,255,.15)}50%{text-shadow:0 0 28px rgba(126,184,247,.5),0 0 60px rgba(100,160,255,.25)}}
+/* TOP-RIGHT */
+.as{position:fixed;top:16px;right:16px;z-index:5000;display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+.gp{background:rgba(0,5,20,.7);backdrop-filter:blur(14px);border:1px solid rgba(126,184,247,.2);padding:5px 13px;border-radius:2px;display:flex;align-items:center;gap:7px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:.67rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;transition:background .15s,transform .12s;white-space:nowrap;color:rgba(180,210,255,.6)}
+.gp:hover{background:rgba(126,184,247,.1);color:#fff}.gp:active{transform:scale(.95)}
+.gp.up{border-color:rgba(126,184,247,.35);color:rgba(126,184,247,.8);animation:pulse 3s ease infinite}
+.gp.up:hover{background:rgba(126,184,247,.1);color:var(--accent)}
+/* DESKTOP */
+#desktop{position:absolute;top:0;left:0;right:0;bottom:var(--th);padding:26px;display:grid;grid-template-columns:repeat(auto-fill,90px);grid-auto-rows:102px;gap:8px;z-index:10;align-content:start}
+.sc{display:flex;flex-direction:column;align-items:center;cursor:pointer;padding:6px;border-radius:4px;transition:background .15s,transform .15s;text-align:center}
+.sc:hover{background:rgba(126,184,247,.08);transform:translateY(-3px)}.sc:active{transform:scale(.9)}
+.si{width:60px;height:60px;border:1px solid rgba(126,184,247,.2);border-radius:8px;overflow:hidden;margin-bottom:6px;background:rgba(0,10,30,.7);box-shadow:0 4px 16px rgba(0,0,0,.7);transition:box-shadow .2s,transform .15s;display:flex;align-items:center;justify-content:center}
+.sc:hover .si{box-shadow:0 10px 28px rgba(0,0,0,.85),0 0 0 1px rgba(126,184,247,.3);transform:scale(1.04)}
+.si img{width:100%;height:100%;object-fit:cover}
+.sc span{font-size:.66rem;font-family:'Barlow Condensed',sans-serif;font-weight:600;letter-spacing:.04em;color:rgba(255,255,255,.88);text-shadow:0 1px 8px #000,0 0 20px #000}
+/* WINDOWS */
+.win{position:absolute;background:rgba(3,8,22,.96);border:1px solid rgba(126,184,247,.15);border-radius:5px;display:none;flex-direction:column;backdrop-filter:blur(40px);z-index:500;box-shadow:0 28px 90px rgba(0,0,0,.95);overflow:hidden;min-width:380px;min-height:300px;resize:both}
+.win.opening{animation:winIn .3s cubic-bezier(.22,1,.36,1) both}
+.wh{padding:10px 13px;background:rgba(0,5,20,.8);display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(126,184,247,.1);cursor:move;flex-shrink:0}
+.wt{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(126,184,247,.4)}
+.wb{width:13px;height:13px;border-radius:50%;border:none;cursor:pointer;transition:opacity .15s,transform .12s;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.wb:hover{opacity:.85;transform:scale(1.15)}
+.wb.x{background:#ff5f57}.wb.fs{background:#28c840}
+.wb svg{width:7px;height:7px;pointer-events:none}
+.win-btns{display:flex;gap:6px;align-items:center}
+/* TABS */
+.tool-tabs{display:flex;border-bottom:1px solid rgba(126,184,247,.1);background:rgba(0,5,20,.6);flex-shrink:0;overflow-x:auto}
+.ttab{font-family:'Barlow Condensed',sans-serif;font-size:.64rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;padding:8px 14px;cursor:pointer;color:rgba(255,255,255,.32);border-bottom:2px solid transparent;transition:all .18s;border-right:1px solid rgba(126,184,247,.08);white-space:nowrap;position:relative;overflow:hidden;flex-shrink:0}
+.ttab:hover{color:rgba(255,255,255,.68);background:rgba(126,184,247,.04)}
+.ttab.on{color:rgba(255,255,255,.9);border-bottom-color:var(--accent);background:rgba(126,184,247,.05)}
+.ttab::after{content:'';position:absolute;inset:0;background:rgba(126,184,247,.1);transform:scaleX(0);transform-origin:left;transition:transform .2s}
+.ttab:active::after{transform:scaleX(1)}
+.tpane{display:none;flex:1;flex-direction:column;overflow:hidden;min-height:0}
+.tpane.on{display:flex;animation:tabIn .22s ease both}
+/* HTML VIEWER */
+.html-editor{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.html-toolbar{padding:7px 11px;background:rgba(0,5,20,.7);display:flex;gap:6px;border-bottom:1px solid rgba(126,184,247,.1);flex-shrink:0;align-items:center;flex-wrap:wrap}
+.html-ic{flex:1;display:flex;background:#020810;overflow:hidden;min-height:0}
+#ln{padding:13px 8px;color:rgba(126,184,247,.2);font-family:'JetBrains Mono',monospace;font-size:.72rem;line-height:1.55;text-align:right;width:40px;min-width:40px;max-width:40px;background:#010509;border-right:1px solid rgba(126,184,247,.08);pointer-events:none;overflow:hidden;flex-shrink:0;white-space:pre;user-select:none;box-sizing:border-box}
+#ce{flex:1;background:transparent;color:rgba(200,225,255,.8);border:none;padding:13px;font-family:'JetBrains Mono',monospace;font-size:.72rem;line-height:1.55;outline:none;resize:none;caret-color:var(--accent);overflow:auto;white-space:pre;word-break:normal;overflow-wrap:normal;min-width:0}
+/* HTML TABS */
+#html-tabs{display:flex;align-items:center;background:rgba(0,5,20,.6);border-bottom:1px solid rgba(126,184,247,.08);overflow-x:auto;flex-shrink:0;min-height:34px}
+/* CALC */
+.calc-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px;gap:11px}
+.calc-screen{width:100%;max-width:300px;background:rgba(0,5,20,.7);border:1px solid rgba(126,184,247,.1);border-radius:4px;padding:13px 16px;text-align:right}
+.calc-expr{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:rgba(255,255,255,.28);min-height:17px;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.calc-val{font-family:'Bebas Neue',sans-serif;font-size:2.3rem;letter-spacing:.04em;color:#fff;line-height:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.calc-val.pop{animation:cPop .18s ease}
+.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:100%;max-width:300px}
+.ck{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.88rem;padding:13px 6px;border:1px solid rgba(126,184,247,.1);border-radius:3px;background:rgba(126,184,247,.05);color:rgba(200,225,255,.8);cursor:pointer;transition:all .1s;text-align:center}
+.ck:hover{background:rgba(126,184,247,.14);color:#fff}.ck:active{transform:scale(.93)}
+.ck.op{background:rgba(126,184,247,.08);color:var(--accent);border-color:rgba(126,184,247,.18)}.ck.op:hover{background:rgba(126,184,247,.18)}
+.ck.eq{background:var(--accent);color:#050d20;border:none;grid-column:span 2}.ck.eq:hover{background:#a8d0ff}
+.ck.wide{grid-column:span 2}
+.ck.clr{background:rgba(255,70,70,.09);color:#f99;border-color:rgba(255,70,70,.14)}.ck.clr:hover{background:rgba(255,70,70,.19)}
+/* TRANSLATOR */
+.trans-wrap{flex:1;display:flex;flex-direction:column;padding:12px;gap:9px;overflow:hidden}
+.lang-row{display:flex;gap:7px;align-items:center;flex-shrink:0}
+.lang-sel{flex:1;background:rgba(126,184,247,.06);color:rgba(200,225,255,.8);border:1px solid rgba(126,184,247,.12);border-radius:3px;padding:7px 9px;font-family:'Barlow Condensed',sans-serif;font-size:.74rem;font-weight:600;outline:none;cursor:pointer}
+.lang-sel option{background:#030d25;color:#fff}
+.swap-btn{background:rgba(126,184,247,.07);color:rgba(126,184,247,.6);border:1px solid rgba(126,184,247,.12);border-radius:3px;padding:7px 11px;cursor:pointer;font-size:.82rem;transition:all .15s;flex-shrink:0}
+.swap-btn:hover{background:rgba(126,184,247,.15);color:#fff;transform:rotate(180deg)}
+.trans-boxes{display:flex;gap:8px;flex:1;overflow:hidden}
+.trans-box{flex:1;display:flex;flex-direction:column;gap:4px;min-height:0}
+.trans-label{font-family:'Barlow Condensed',sans-serif;font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(126,184,247,.35)}
+.trans-area{flex:1;background:rgba(0,5,20,.5);color:rgba(200,225,255,.8);border:1px solid rgba(126,184,247,.08);border-radius:3px;padding:10px;font-family:'Barlow',sans-serif;font-size:.82rem;line-height:1.5;resize:none;outline:none;caret-color:var(--accent);min-height:0}
+.trans-area.out{color:rgba(150,200,255,.6);background:rgba(126,184,247,.03)}
+.trans-btn-row{display:flex;gap:6px;flex-shrink:0;align-items:center}
+/* TOOL GENERIC PANE */
+.tool-pad{flex:1;display:flex;flex-direction:column;gap:8px;padding:14px;overflow:hidden;min-height:0}
+.tool-row{display:flex;gap:8px;flex-shrink:0;align-items:center}
+.tool-ta{flex:1;background:rgba(0,5,20,.5);color:rgba(200,225,255,.8);border:1px solid rgba(126,184,247,.08);border-radius:3px;padding:10px;font-family:'JetBrains Mono',monospace;font-size:.76rem;line-height:1.5;resize:none;outline:none;caret-color:var(--accent);min-height:0}
+.tool-ta.out{color:rgba(150,220,200,.8);background:rgba(0,5,20,.4)}
+.tool-ta.err{color:rgba(255,160,160,.8)}
+/* COLOR PICKER PANE */
+.color-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:20px}
+.color-display{width:140px;height:140px;border-radius:8px;border:1px solid rgba(126,184,247,.15);transition:background .1s;box-shadow:0 8px 32px rgba(0,0,0,.6)}
+.color-info{display:flex;flex-direction:column;gap:6px;align-items:center}
+.color-val{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:rgba(200,225,255,.7);cursor:pointer;transition:color .1s}
+.color-val:hover{color:#fff}
+input[type=color]{width:48px;height:48px;border:none;background:none;cursor:pointer;border-radius:6px;padding:0}
+/* CALENDAR */
+.cw{position:fixed;width:265px;background:rgba(2,8,22,.98);border:1px solid rgba(126,184,247,.15);border-radius:4px;backdrop-filter:blur(40px);display:none;flex-direction:column;z-index:3000;padding:14px;box-shadow:0 16px 50px rgba(0,0,0,.95);transition:opacity .18s,transform .18s}
+.cw.open{animation:calUp .25s cubic-bezier(.22,1,.36,1) both}
+.ch{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+#calM{font-family:'Bebas Neue',sans-serif;font-size:.93rem;letter-spacing:.12em;color:rgba(126,184,247,.9)}
+.cn button{background:rgba(126,184,247,.06);color:rgba(126,184,247,.5);border:1px solid rgba(126,184,247,.12);width:22px;height:22px;border-radius:2px;cursor:pointer;font-size:.72rem;transition:all .12s}
+.cn button:hover{background:rgba(126,184,247,.15);color:#fff;transform:scale(1.1)}
+.cg{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center;font-size:.68rem}
+.dl{opacity:.25;font-family:'Barlow Condensed',sans-serif;font-weight:700;padding:3px 0;font-size:.57rem;letter-spacing:.1em;color:var(--accent)}
+.cd{padding:5px 2px;border-radius:3px;cursor:default;font-family:'Barlow Condensed',sans-serif;font-weight:600;color:rgba(180,210,255,.5);transition:background .1s,transform .1s}
+.cd:hover{background:rgba(126,184,247,.08);color:#fff;transform:scale(1.1)}
+.cd.today{background:rgba(126,184,247,.15);color:var(--accent);font-weight:700}.cd.om{opacity:.15}
+/* BUTTONS */
+.rb{background:rgba(126,184,247,.07);color:rgba(180,210,255,.7);border:1px solid rgba(126,184,247,.18);padding:7px 14px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.7rem;letter-spacing:.17em;text-transform:uppercase;border-radius:2px;cursor:pointer;transition:all .12s}
+.rb:hover{background:rgba(126,184,247,.14);color:#fff;border-color:rgba(126,184,247,.35)}.rb:active{transform:scale(.95);opacity:.8}
+.rb.p{background:var(--accent);color:#050d20;border:none}.rb.p:hover{background:#a8d0ff}
+.rb.sm{padding:5px 11px;font-size:.65rem}
+/* TASKBAR */
+#tb{position:fixed;bottom:0;width:100%;height:var(--th);background:rgba(1,5,18,.92);display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-top:1px solid rgba(126,184,247,.1);z-index:2000;backdrop-filter:blur(22px)}
+#tbl{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.24em;opacity:.7;color:var(--accent);flex-shrink:0}
+#tpm{display:flex;align-items:center;gap:4px;flex-shrink:0}
+.tp{width:33px;height:33px;border-radius:3px;border:1px solid transparent;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .12s}
+.tp:hover,.tp.active{background:rgba(126,184,247,.07);border-color:rgba(126,184,247,.15)}
+.tp svg{width:16px;height:16px;opacity:.7}.tp:hover svg{opacity:1}
+#tb-sites{display:flex;align-items:center;gap:5px;flex:1;justify-content:center;overflow:hidden}
+.tb-site{display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:3px;cursor:pointer;background:rgba(126,184,247,.04);border:1px solid rgba(126,184,247,.1);transition:all .15s;flex-shrink:0;position:relative;overflow:hidden}
+.tb-site:hover{background:rgba(126,184,247,.12);border-color:rgba(126,184,247,.28);transform:translateY(-2px)}.tb-site:active{transform:scale(.93)}
+.tb-site img{width:18px;height:18px;border-radius:3px;object-fit:cover;flex-shrink:0}
+.tb-site span{font-family:'Barlow Condensed',sans-serif;font-size:.65rem;font-weight:700;letter-spacing:.1em;color:rgba(180,210,255,.7);white-space:nowrap}
+.tb-site:hover span{color:#fff}
+.rp{position:absolute;border-radius:50%;background:rgba(126,184,247,.3);pointer-events:none;animation:ripple .5s linear}
+.tr{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.cb{text-align:right;cursor:pointer;transition:opacity .12s}.cb:hover{opacity:.75}
+#clk{font-family:'Barlow Condensed',sans-serif;font-size:.85rem;font-weight:700;font-variant-numeric:tabular-nums;color:rgba(200,225,255,.85)}
+#dt{font-family:'Barlow Condensed',sans-serif;font-size:.56rem;opacity:.3;letter-spacing:.12em;margin-top:1px}
+.bw{display:flex;align-items:center;gap:5px}
+#bt{font-family:'Barlow Condensed',sans-serif;font-size:.62rem;font-weight:700;opacity:.5;color:rgba(126,184,247,.8)}
+#bs{width:30px;height:13px;border:1px solid rgba(126,184,247,.25);border-radius:2px;position:relative}
+#bs::after{content:'';position:absolute;right:-4px;top:50%;transform:translateY(-50%);width:3px;height:6px;background:rgba(126,184,247,.25);border-radius:0 1px 1px 0}
+#bl{height:100%;background:rgba(126,184,247,.7);border-radius:1px;transition:width .5s}
+/* OVERLAYS */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;z-index:7000}
+.ov.active{display:flex;animation:fadeIn .2s ease}
+.mc{background:rgba(2,8,22,.99);color:#fff;width:420px;padding:32px;border-radius:4px;border:1px solid rgba(126,184,247,.15);box-shadow:0 22px 65px rgba(0,0,0,.95);position:relative;animation:popIn .28s ease}
+.mc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(126,184,247,.4) 30%,rgba(126,184,247,.4) 70%,transparent)}
+.mc-tag{font-family:'Barlow Condensed',sans-serif;font-size:.57rem;letter-spacing:.28em;color:rgba(126,184,247,.3);text-transform:uppercase;margin-bottom:8px}
+.mc h2{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.06em;margin-bottom:18px}
+.mc p{color:rgba(180,210,255,.5);font-size:.81rem;line-height:1.65;margin-bottom:20px}
+.ma{display:flex;gap:8px}.ma .rb{flex:1}
+/* UPDATES */
+.up-cards{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.up-card{background:rgba(126,184,247,.04);border:1px solid rgba(126,184,247,.1);border-radius:4px;padding:14px 16px;position:relative;overflow:hidden;animation:cardIn .35s ease both}
+.up-card:nth-child(1){animation-delay:.05s}
+.up-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(126,184,247,.15),transparent)}
+.up-label{font-family:'Barlow Condensed',sans-serif;font-size:.57rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(126,184,247,.3);margin-bottom:5px}
+.up-title{font-family:'Bebas Neue',sans-serif;font-size:1.25rem;letter-spacing:.06em;color:rgba(255,255,255,.85);line-height:1}
+.up-sub{font-size:.76rem;color:rgba(180,210,255,.4);margin-top:3px}
+.free-badge{display:inline-block;margin-top:7px;font-family:'Barlow Condensed',sans-serif;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;padding:2px 8px;border:1px solid rgba(100,255,140,.3);border-radius:2px;color:rgba(120,255,160,.7);background:rgba(80,200,100,.06)}
+/* SETTINGS */
+.set-mc{background:rgba(2,8,22,.99);color:#fff;width:540px;max-height:82vh;overflow-y:auto;padding:32px;border-radius:4px;border:1px solid rgba(126,184,247,.15);box-shadow:0 22px 65px rgba(0,0,0,.95);position:relative;animation:popIn .28s ease}
+.set-mc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(126,184,247,.4) 30%,rgba(126,184,247,.4) 70%,transparent)}
+.set-mc::-webkit-scrollbar{width:4px}.set-mc::-webkit-scrollbar-thumb{background:rgba(126,184,247,.15);border-radius:2px}
+.set-sec{margin-bottom:26px}
+.set-lbl{font-family:'Barlow Condensed',sans-serif;font-size:.6rem;letter-spacing:.28em;text-transform:uppercase;color:rgba(126,184,247,.3);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(126,184,247,.08)}
+.font-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.fo{padding:11px 13px;border:1px solid rgba(126,184,247,.08);border-radius:3px;cursor:pointer;transition:all .14s;background:rgba(126,184,247,.03)}
+.fo:hover{background:rgba(126,184,247,.08);border-color:rgba(126,184,247,.2)}
+.fo.on{border-color:rgba(126,184,247,.5);background:rgba(126,184,247,.08)}
+.fo-name{font-size:.72rem;color:rgba(200,225,255,.75);margin-bottom:3px}
+.fo-prev{font-size:1.1rem;color:rgba(180,210,255,.4);line-height:1.2}
+.wp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.wp{aspect-ratio:16/9;border-radius:3px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all .14s;position:relative}
+.wp:hover{border-color:rgba(126,184,247,.4);transform:scale(1.03)}.wp.on{border-color:var(--accent)}
+.wp video{width:100%;height:100%;object-fit:cover;display:block}
+.wp.on::after{content:'✓';position:absolute;bottom:4px;right:5px;font-size:.65rem;color:var(--accent);font-weight:700;font-family:'Barlow Condensed',sans-serif}
+.mus-btn{background:rgba(126,184,247,.06);border:1px solid rgba(126,184,247,.12);color:rgba(180,210,255,.7);padding:7px 16px;border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;transition:all .12s;flex-shrink:0}
+.mus-btn:hover{background:rgba(126,184,247,.14);color:#fff}
+.mus-btn.on{background:rgba(126,184,247,.12);border-color:rgba(126,184,247,.35);color:var(--accent)}
+.vol-row{display:flex;align-items:center;gap:8px;flex:1}
+.vol-lbl{font-family:'Barlow Condensed',sans-serif;font-size:.6rem;letter-spacing:.15em;color:rgba(126,184,247,.35);text-transform:uppercase;flex-shrink:0}
+#volS,#dimS{flex:1;-webkit-appearance:none;height:3px;border-radius:2px;background:rgba(126,184,247,.15);outline:none;cursor:pointer}
+#volS::-webkit-slider-thumb,#dimS::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--accent);cursor:pointer}
+/* CENTER CLOCK */
+#cc{position:fixed;top:50%;right:12%;transform:translateY(-50%);z-index:15;text-align:right;pointer-events:none;transition:opacity .4s}
+#cc.cc-hide{opacity:0}
+.cc-t{font-family:'Bebas Neue',sans-serif;font-size:4.2rem;letter-spacing:.06em;line-height:1;color:rgba(126,184,247,.55);animation:ccGlow 4s ease infinite;mix-blend-mode:screen}
+.cc-d{font-family:'Barlow Condensed',sans-serif;font-size:.85rem;font-weight:700;letter-spacing:.28em;text-transform:uppercase;color:rgba(126,184,247,.3);margin-top:3px}
+.cc-m{font-family:'Barlow Condensed',sans-serif;font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(126,184,247,.18);margin-top:1px}
+/* HIDE BTN */
+#hb{position:fixed;bottom:calc(var(--th)+12px);left:16px;z-index:4000;background:rgba(0,5,20,.6);backdrop-filter:blur(14px);border:1px solid rgba(126,184,247,.12);padding:6px 13px;border-radius:2px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:.67rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(180,210,255,.5);transition:all .15s;display:flex;align-items:center;gap:6px}
+#hb:hover{background:rgba(126,184,247,.1);color:#fff;border-color:rgba(126,184,247,.25)}
+#hb.sm{border-color:rgba(126,184,247,.3);color:rgba(126,184,247,.8)}
+.ui-hidden #desktop,.ui-hidden .as,.ui-hidden #tw,.ui-hidden #nw,.ui-hidden .cw,.ui-hidden .ov{opacity:0!important;pointer-events:none!important;transition:opacity .4s}
+/* MEDIA PICKER */
+.media-pick{display:flex;gap:12px;margin-bottom:24px}
+.media-card{flex:1;background:rgba(126,184,247,.05);border:1px solid rgba(126,184,247,.15);border-radius:5px;padding:20px 14px;cursor:pointer;text-align:center;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:8px}
+.media-card:hover{background:rgba(126,184,247,.12);border-color:rgba(126,184,247,.35);transform:translateY(-2px)}
+.media-card svg{opacity:.8}
+.media-card-label{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.1em;color:#fff}
+/* EMBED WINDOWS */
+.embed-win{position:fixed;background:rgba(2,8,22,.97);border:1px solid rgba(126,184,247,.18);border-radius:5px;display:none;flex-direction:column;z-index:600;box-shadow:0 28px 90px rgba(0,0,0,.95);overflow:hidden;min-width:500px;min-height:400px;resize:both}
+.embed-win.opening{animation:winIn .3s cubic-bezier(.22,1,.36,1) both}
+.embed-wh{padding:9px 12px;background:rgba(0,5,20,.85);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(126,184,247,.1);cursor:move;flex-shrink:0}
+.embed-title{font-family:'Barlow Condensed',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(126,184,247,.45)}
+.embed-btns{display:flex;gap:6px;align-items:center}
+.embed-win iframe{flex:1;border:none;width:100%;height:100%;min-height:0;display:block;overflow:hidden}
+/* CURSOR OPTIONS */
+.cursor-opt{width:80px;height:60px;border:2px solid rgba(126,184,247,.1);border-radius:4px;cursor:pointer;background:rgba(126,184,247,.03);display:flex;gap:4px;padding:6px;align-items:flex-start;justify-content:flex-start;transition:all .14s;overflow:hidden;flex-shrink:0}
+.cursor-opt:hover{border-color:rgba(126,184,247,.3);background:rgba(126,184,247,.08)}
+.cursor-opt.on{border-color:rgba(126,184,247,.6);background:rgba(126,184,247,.1)}
+.cursor-opt img{width:22px;height:22px;object-fit:contain;image-rendering:pixelated}
+</style></head><body>
+
+<div id="main">
+<div id="vbg"><video id="bgVid" autoplay muted loop playsinline><source src="https://github.com/MISTERCOOL27277/873637373737377/raw/refs/heads/main/yuta-jujutsu-kaisen.960x540.mp4" type="video/mp4"></video></div>
+
+<div class="as">
+  <div class="gp up" onclick="shOv('upOv')"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.2"/><path d="M6 3.5v3l2 1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg><span>Updates</span></div>
+  <div class="gp" onclick="shOv('setOv')"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="1.8" stroke="currentColor" stroke-width="1.2"/><path d="M6 1v1.5M6 9.5V11M1 6h1.5M9.5 6H11M2.1 2.1l1.1 1.1M8.8 8.8l1.1 1.1M9.9 2.1L8.8 3.2M3.2 8.8L2.1 9.9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg><span>Settings</span></div>
+  <div class="gp" onclick="shOv('ho')"><span style="opacity:.4;margin-right:2px">?</span><span>Help</span></div>
+  <div class="gp" onclick="shOv('aboutOv')"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.2"/><path d="M6 5.5v3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="6" cy="3.5" r=".7" fill="currentColor"/></svg><span>About</span></div>
+  <div class="gp" onclick="shOv('socialsOv')"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="2.5" width="10" height="7" rx="2" fill="#FF0000"/><polygon points="4.5,4.5 4.5,7.5 8,6" fill="#fff"/></svg><span>Our Socials</span></div>
+</div>
+
+<!-- TOOLS WINDOW -->
+<div id="tw" class="win" style="top:5%;left:5%;width:70%;height:74%">
+  <div class="wh" id="tw-h">
+    <div class="win-btns">
+      <button class="wb x" onclick="clWin('tw')"><svg viewBox="0 0 7 7" fill="none"><path d="M1 1l5 5M6 1L1 6" stroke="rgba(0,0,0,.6)" stroke-width="1.2" stroke-linecap="round"/></svg></button>
+      <button class="wb fs" onclick="toggleWinFS('tw')"><svg id="tw-fsbtn" viewBox="0 0 7 7" fill="none"><path d="M1 3V1h2M6 4v2H4M4 1h2v2M1 4v2h2" stroke="rgba(0,0,0,.6)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+    <span class="wt">tafohub_tools</span>
+    <span style="width:20px"></span>
+  </div>
+  <div class="tool-tabs">
+    <div class="ttab on" onclick="swTab('html')">HTML Viewer</div>
+    <div class="ttab" onclick="swTab('calc')">Calculator</div>
+    <div class="ttab" onclick="swTab('trans')">Translator</div>
+    <div class="ttab" onclick="swTab('json')">JSON Format</div>
+    <div class="ttab" onclick="swTab('b64')">Base64</div>
+    <div class="ttab" onclick="swTab('clr')">Colors</div>
+  </div>
+
+  <!-- HTML VIEWER -->
+  <div class="tpane on" id="pane-html">
+    <div class="html-editor">
+      <div id="html-tabs"></div>
+      <div class="html-toolbar">
+        <button class="rb p" onclick="runHtml()">&#9654; Run</button>
+        <button class="rb" onclick="newHtmlTab()">+ New Tab</button>
+        <button class="rb" onclick="getCe().value='';updL()">Clear</button>
+        <button class="rb" onclick="copyHtml()">Copy</button>
+        <button class="rb" onclick="dlHtml()">Download</button>
+        <label class="rb" style="cursor:pointer;margin:0">Upload<input type="file" accept=".html,.htm" style="display:none" onchange="ulHtml(this)"></label>
+        <span id="lc" style="margin-left:auto;font-family:'Barlow Condensed',sans-serif;font-size:.62rem;color:rgba(126,184,247,.3)">1 line</span>
+      </div>
+      <div class="html-ic"><div id="ln">1</div><textarea id="ce" spellcheck="false"></textarea></div>
+    </div>
+  </div>
+
+  <!-- CALCULATOR -->
+  <div class="tpane" id="pane-calc">
+    <div class="calc-wrap">
+      <div class="calc-screen"><div class="calc-expr" id="cE"></div><div class="calc-val" id="cV">0</div></div>
+      <div class="calc-grid">
+        <div class="ck clr" onclick="cAC()">AC</div><div class="ck op" onclick="cSgn()">+/&#8722;</div><div class="ck op" onclick="cPct()">%</div><div class="ck op" onclick="cOp('/')">&#247;</div>
+        <div class="ck" onclick="cN('7')">7</div><div class="ck" onclick="cN('8')">8</div><div class="ck" onclick="cN('9')">9</div><div class="ck op" onclick="cOp('*')">&#215;</div>
+        <div class="ck" onclick="cN('4')">4</div><div class="ck" onclick="cN('5')">5</div><div class="ck" onclick="cN('6')">6</div><div class="ck op" onclick="cOp('-')">&#8722;</div>
+        <div class="ck" onclick="cN('1')">1</div><div class="ck" onclick="cN('2')">2</div><div class="ck" onclick="cN('3')">3</div><div class="ck op" onclick="cOp('+')">+</div>
+        <div class="ck wide" onclick="cN('0')">0</div><div class="ck" onclick="cDot()">.</div><div class="ck eq" onclick="cEq()">=</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRANSLATOR -->
+  <div class="tpane" id="pane-trans">
+    <div class="trans-wrap">
+      <div class="lang-row">
+        <select class="lang-sel" id="tF"><option value="auto">Detect</option><option value="en">English</option><option value="es">Spanish</option><option value="fr">French</option><option value="de">German</option><option value="it">Italian</option><option value="pt">Portuguese</option><option value="ru">Russian</option><option value="ja">Japanese</option><option value="ko">Korean</option><option value="zh">Chinese</option><option value="ar">Arabic</option><option value="hi">Hindi</option><option value="tr">Turkish</option><option value="nl">Dutch</option><option value="pl">Polish</option><option value="sv">Swedish</option></select>
+        <button class="swap-btn" onclick="swapL()">&#8644;</button>
+        <select class="lang-sel" id="tT"><option value="en">English</option><option value="es">Spanish</option><option value="fr">French</option><option value="de">German</option><option value="it">Italian</option><option value="pt">Portuguese</option><option value="ru">Russian</option><option value="ja">Japanese</option><option value="ko">Korean</option><option value="zh">Chinese</option><option value="ar">Arabic</option><option value="hi">Hindi</option><option value="tr">Turkish</option><option value="nl">Dutch</option><option value="pl">Polish</option><option value="sv">Swedish</option></select>
+      </div>
+      <div class="trans-boxes">
+        <div class="trans-box"><div class="trans-label">Source</div><textarea class="trans-area" id="tIn" placeholder="Type to translate..."></textarea></div>
+        <div class="trans-box"><div class="trans-label">Translation</div><textarea class="trans-area out" id="tOut" readonly placeholder="Appears here..."></textarea></div>
+      </div>
+      <div class="trans-btn-row">
+        <button class="rb p" onclick="doTrans()">Translate</button>
+        <button class="rb" onclick="document.getElementById('tIn').value='';document.getElementById('tOut').value=''">Clear</button>
+        <button class="rb" onclick="navigator.clipboard.writeText(document.getElementById('tOut').value).catch(()=>{})">Copy</button>
+        <span id="tSt" style="font-family:'Barlow Condensed',sans-serif;font-size:.64rem;color:rgba(126,184,247,.35);margin-left:auto;align-self:center"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- JSON FORMATTER -->
+  <div class="tpane" id="pane-json">
+    <div class="tool-pad">
+      <div class="tool-row">
+        <button class="rb p" onclick="fmtJson()">Format</button>
+        <button class="rb" onclick="minJson()">Minify</button>
+        <button class="rb" onclick="document.getElementById('jIn').value='';document.getElementById('jOut').value='';document.getElementById('jOut').className='tool-ta out'">Clear</button>
+        <button class="rb" onclick="navigator.clipboard.writeText(document.getElementById('jOut').value).catch(()=>{})">Copy</button>
+      </div>
+      <textarea class="tool-ta" id="jIn" placeholder='{"paste":"your JSON here"}' style="flex:.45"></textarea>
+      <textarea class="tool-ta out" id="jOut" readonly placeholder="Formatted output..." style="flex:.55"></textarea>
+    </div>
+  </div>
+
+  <!-- BASE64 -->
+  <div class="tpane" id="pane-b64">
+    <div class="tool-pad">
+      <div class="tool-row">
+        <button class="rb p" onclick="doEnc()">Encode</button>
+        <button class="rb" onclick="doDec()">Decode</button>
+        <button class="rb" onclick="document.getElementById('b64In').value='';document.getElementById('b64Out').value=''">Clear</button>
+        <button class="rb" onclick="navigator.clipboard.writeText(document.getElementById('b64Out').value).catch(()=>{})">Copy result</button>
+      </div>
+      <textarea class="tool-ta" id="b64In" placeholder="Type text to encode, or Base64 to decode..." style="flex:.45"></textarea>
+      <textarea class="tool-ta out" id="b64Out" readonly placeholder="Result appears here..." style="flex:.55"></textarea>
+    </div>
+  </div>
+
+  <!-- COLOR PICKER -->
+  <div class="tpane" id="pane-clr">
+    <div class="color-wrap">
+      <input type="color" id="colorPick" value="#7eb8f7" oninput="updColor(this.value)">
+      <div class="color-display" id="colorDisp" style="background:#7eb8f7"></div>
+      <div class="color-info">
+        <div class="color-val" id="colorHex" onclick="navigator.clipboard.writeText(this.textContent).catch(()=>{})" title="Click to copy">#7eb8f7</div>
+        <div class="color-val" id="colorRgb" onclick="navigator.clipboard.writeText(this.textContent).catch(()=>{})" title="Click to copy">rgb(126, 184, 247)</div>
+        <div class="color-val" id="colorHsl" onclick="navigator.clipboard.writeText(this.textContent).catch(()=>{})" title="Click to copy">hsl(210, 88%, 73%)</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:.6rem;letter-spacing:.15em;color:rgba(126,184,247,.25);text-transform:uppercase;margin-top:4px">Click a value to copy</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NOTES WINDOW -->
+<div id="nw" class="win" style="top:10%;left:30%;width:360px;height:400px">
+  <div class="wh" id="nw-h">
+    <div class="win-btns">
+      <button class="wb x" onclick="clWin('nw')"><svg viewBox="0 0 7 7" fill="none"><path d="M1 1l5 5M6 1L1 6" stroke="rgba(0,0,0,.6)" stroke-width="1.2" stroke-linecap="round"/></svg></button>
+      <button class="wb fs" onclick="toggleWinFS('nw')"><svg id="nw-fsbtn" viewBox="0 0 7 7" fill="none"><path d="M1 3V1h2M6 4v2H4M4 1h2v2M1 4v2h2" stroke="rgba(0,0,0,.6)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+    <span class="wt">notes</span>
+    <span style="width:20px"></span>
+  </div>
+  <textarea id="noteArea" spellcheck="true" style="flex:1;background:#010509;color:rgba(200,225,255,.8);border:none;padding:16px;font-family:'Barlow',sans-serif;font-size:.88rem;line-height:1.7;outline:none;resize:none;caret-color:var(--accent)" placeholder="Start typing notes..."></textarea>
+</div>
+
+<!-- SHOWS EMBED WINDOW -->
+<div id="showsWin" class="embed-win" style="top:8%;left:8%;width:75%;height:80%">
+  <div class="embed-wh" id="showsWin-h">
+    <div class="embed-btns">
+      <button class="wb x" onclick="clEmbedWin('showsWin')"><svg viewBox="0 0 7 7" fill="none"><path d="M1 1l5 5M6 1L1 6" stroke="rgba(0,0,0,.6)" stroke-width="1.2" stroke-linecap="round"/></svg></button>
+      <button class="wb fs" onclick="fsEmbedWin('showsWin')"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3V1h2M6 4v2H4M4 1h2v2M1 4v2h2" stroke="rgba(0,0,0,.6)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+    <span class="embed-title">Shows</span>
+    <span style="width:20px"></span>
+  </div>
+  <iframe id="showsFrame" src="" style="flex:1;border:none;width:100%;min-height:0" allow="autoplay; fullscreen"></iframe>
+</div>
+
+<!-- MOVIES EMBED WINDOW -->
+<div id="moviesWin" class="embed-win" style="top:8%;left:8%;width:75%;height:80%">
+  <div class="embed-wh" id="moviesWin-h">
+    <div class="embed-btns">
+      <button class="wb x" onclick="clEmbedWin('moviesWin')"><svg viewBox="0 0 7 7" fill="none"><path d="M1 1l5 5M6 1L1 6" stroke="rgba(0,0,0,.6)" stroke-width="1.2" stroke-linecap="round"/></svg></button>
+      <button class="wb fs" onclick="fsEmbedWin('moviesWin')"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3V1h2M6 4v2H4M4 1h2v2M1 4v2h2" stroke="rgba(0,0,0,.6)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+    <span class="embed-title">Movies</span>
+    <span style="width:20px"></span>
+  </div>
+  <iframe id="moviesFrame" src="" style="flex:1;border:none;width:100%;min-height:0" allow="autoplay; fullscreen"></iframe>
+</div>
+
+<!-- GAMES EMBED WINDOW -->
+<div id="gamesWin" class="embed-win" style="top:8%;left:8%;width:75%;height:80%">
+  <div class="embed-wh" id="gamesWin-h">
+    <div class="embed-btns">
+      <button class="wb x" onclick="clEmbedWin('gamesWin')"><svg viewBox="0 0 7 7" fill="none"><path d="M1 1l5 5M6 1L1 6" stroke="rgba(0,0,0,.6)" stroke-width="1.2" stroke-linecap="round"/></svg></button>
+      <button class="wb fs" onclick="fsEmbedWin('gamesWin')"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3V1h2M6 4v2H4M4 1h2v2M1 4v2h2" stroke="rgba(0,0,0,.6)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+    <span class="embed-title">Games</span>
+    <span style="width:20px"></span>
+  </div>
+  <iframe id="gamesFrame" src="" style="flex:1;border:none;width:100%;min-height:0" allow="autoplay; fullscreen"></iframe>
+</div>
+
+<!-- PROXIES EMBED WINDOW -->
+<div id="proxiesWin" class="embed-win" style="top:8%;left:8%;width:75%;height:80%">
+  <div class="embed-wh" id="proxiesWin-h">
+    <div class="embed-btns">
+      <button class="wb x" onclick="clEmbedWin('proxiesWin')"><svg viewBox="0 0 7 7" fill="none"><path d="M1 1l5 5M6 1L1 6" stroke="rgba(0,0,0,.6)" stroke-width="1.2" stroke-linecap="round"/></svg></button>
+      <button class="wb fs" onclick="fsEmbedWin('proxiesWin')"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3V1h2M6 4v2H4M4 1h2v2M1 4v2h2" stroke="rgba(0,0,0,.6)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+    <span class="embed-title">Proxies</span>
+    <span style="width:20px"></span>
+  </div>
+  <iframe id="proxiesFrame" src="" style="flex:1;border:none;width:100%;min-height:0" allow="autoplay; fullscreen"></iframe>
+</div>
+
+<!-- CALL EMBED WINDOW -->
+<div id="callWin" class="embed-win" style="top:8%;left:8%;width:75%;height:80%">
+  <div class="embed-wh" id="callWin-h">
+    <div class="embed-btns">
+      <button class="wb x" onclick="clEmbedWin('callWin')"><svg viewBox="0 0 7 7" fill="none"><path d="M1 1l5 5M6 1L1 6" stroke="rgba(0,0,0,.6)" stroke-width="1.2" stroke-linecap="round"/></svg></button>
+      <button class="wb fs" onclick="fsEmbedWin('callWin')"><svg viewBox="0 0 7 7" fill="none"><path d="M1 3V1h2M6 4v2H4M4 1h2v2M1 4v2h2" stroke="rgba(0,0,0,.6)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+    <span class="embed-title">Call</span>
+    <span style="width:20px"></span>
+  </div>
+  <iframe id="callFrame" src="" style="flex:1;border:none;width:100%;height:100%;min-height:0;display:block;overflow:hidden" allow="autoplay; fullscreen; microphone; camera"></iframe>
+</div>
+
+<!-- CALENDAR -->
+<div class="cw" id="cw">
+  <div class="ch"><span id="calM">MONTH</span><div style="display:flex;gap:6px;align-items:center"><div class="cn" style="display:flex;gap:5px"><button onclick="calNav(-1)">&#8249;</button><button onclick="calNav(1)">&#8250;</button></div><button onclick="tgCal()" style="background:none;border:none;color:rgba(126,184,247,.25);cursor:pointer;font-size:.86rem;padding:0 3px">&#10005;</button></div></div>
+  <div class="cg" id="calG"></div>
+</div>
+
+<!-- DESKTOP -->
+<div id="desktop">
+  <div class="sc" onclick="opWin('tw')"><div class="si"><img src="https://drive.google.com/thumbnail?id=1oxZpe8H9LBaksTf3xnyzSSTVv2BM0KjD&sz=w500"></div><span>Tools</span></div>
+  <div class="sc" onclick="opWin('nw')"><div class="si"><svg width="32" height="32" viewBox="0 0 32 32" fill="none"><rect x="5" y="4" width="22" height="24" rx="3" stroke="rgba(126,184,247,.5)" stroke-width="1.8"/><line x1="9" y1="11" x2="23" y2="11" stroke="rgba(126,184,247,.3)" stroke-width="1.4" stroke-linecap="round"/><line x1="9" y1="16" x2="23" y2="16" stroke="rgba(126,184,247,.3)" stroke-width="1.4" stroke-linecap="round"/><line x1="9" y1="21" x2="18" y2="21" stroke="rgba(126,184,247,.3)" stroke-width="1.4" stroke-linecap="round"/></svg></div><span>Notes</span></div>
+</div>
+
+<!-- TASKBAR -->
+<div id="tb">
+  <div id="tbl">TafoHub</div><div id="tpm"></div>
+  <div id="tb-sites">
+    <div class="tb-site" onclick="openEmbedWin('gamesWin','gamesFrame','https://cdn.jsdelivr.net/gh/TafoHubOffical/TafoHub-DONTDMCA-games-222@main/Tafo-Games-single.file..html')"><img src="https://drive.google.com/thumbnail?id=1yfTfj0YN13xgFxU7qlGR5EYuJE97tO3h&sz=w500" alt=""><span>Games</span></div>
+    <div class="tb-site" onclick="shOv('mediaPickOv')"><img src="https://drive.google.com/thumbnail?id=1qgfCyy56EJHJorqWl9G8iTboGMlK1Tq_&sz=w500" alt=""><span>Media</span></div>
+    <div class="tb-site" onclick="openEmbedWin('proxiesWin','proxiesFrame','https://cdn.jsdelivr.net/gh/TafoHubOffical/TafoHub-DONTDMCA-Proxies-222@main/TafoProxies-single.file.html')"><img src="https://drive.google.com/thumbnail?id=1nSOJoW3NNzNl_0-64FyF7ep1wxr0dht8&sz=w500" alt=""><span>Proxies</span></div>
+    <div class="tb-site" onclick="openEmbedWin('callWin','callFrame','https://cdn.jsdelivr.net/gh/TafoHubOffical/TafoHub-DONTDMCA-TafoChat-222@main/TafoChat-single.file.html')"><img src="https://drive.google.com/thumbnail?id=1ebw6TH5oyLvxsNf82yZCfdAmOpBqK4IX&sz=w500" alt=""><span>Call</span></div>
+  </div>
+  <div class="tr">
+    <div class="cb" onclick="tgCal()"><div id="clk">00:00 AM</div><div id="dt">00/00/2026</div></div>
+    <div class="bw"><span id="btChg" style="display:none;align-items:center" title="Charging"><svg width="10" height="13" viewBox="0 0 10 13" fill="none"><rect x="3" y="0" width="4" height="2" rx=".5" fill="rgba(100,220,100,.9)"/><rect x="1" y="2" width="8" height="7" rx="1.5" stroke="rgba(100,220,100,.8)" stroke-width="1.2" fill="none"/><line x1="3.5" y1="5" x2="3.5" y2="7" stroke="rgba(100,220,100,.9)" stroke-width="1.2" stroke-linecap="round"/><line x1="6.5" y1="5" x2="6.5" y2="7" stroke="rgba(100,220,100,.9)" stroke-width="1.2" stroke-linecap="round"/><line x1="5" y1="9" x2="5" y2="12" stroke="rgba(100,220,100,.8)" stroke-width="1.2" stroke-linecap="round"/></svg></span><span id="bt">--%</span><div id="bs"><div id="bl" style="width:0%"></div></div></div>
+  </div>
+</div>
+
+<!-- MEDIA PICKER OVERLAY -->
+<div class="ov" id="mediaPickOv">
+  <div class="mc">
+    <div class="mc-tag">TafoHub</div>
+    <h2>Media</h2>
+    <div class="media-pick">
+      <div class="media-card" onclick="clOv('mediaPickOv');openEmbedWin('showsWin','showsFrame','https://cdn.jsdelivr.net/gh/TafoHubOffical/TafoHub-DONTDMCA-Shows-222@main/Tafo-Shows-Single.File.html')">
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none"><rect x="2" y="6" width="32" height="24" rx="3" stroke="rgba(126,184,247,.7)" stroke-width="1.8"/><rect x="13" y="13" width="10" height="10" rx="1" fill="rgba(126,184,247,.5)"/><line x1="2" y1="26" x2="34" y2="26" stroke="rgba(126,184,247,.3)" stroke-width="1.2"/></svg>
+        <div class="media-card-label">Shows</div>
+      </div>
+      <div class="media-card" onclick="clOv('mediaPickOv');openEmbedWin('moviesWin','moviesFrame','https://cdn.jsdelivr.net/gh/TafoHubOffical/TafoHub-DONTDMCA-Movies2222@main/tafo-singlefile.movies.html')">
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none"><rect x="2" y="7" width="32" height="22" rx="3" stroke="rgba(126,184,247,.7)" stroke-width="1.8"/><circle cx="18" cy="18" r="6" stroke="rgba(126,184,247,.5)" stroke-width="1.5"/><polygon points="15.5,14.5 15.5,21.5 23,18" fill="rgba(126,184,247,.6)"/></svg>
+        <div class="media-card-label">Movies</div>
+      </div>
+    </div>
+    <div class="ma"><button class="rb" onclick="clOv('mediaPickOv')">Close</button></div>
+  </div>
+</div>
+
+<!-- UPDATES OVERLAY -->
+<div class="ov" id="upOv">
+  <div class="mc"><div class="mc-tag">What's New</div><h2>Updates</h2>
+    <div class="up-cards">
+      <div class="up-card">
+        <div class="up-label">Access</div>
+        <div class="up-title">Made Free</div>
+        <div class="up-sub">TafoHub is completely free for everyone &#8212; I'm feeling generous :)</div>
+        <span class="free-badge">Free Forever</span>
+      </div>
+    </div>
+    <div class="ma"><button class="rb p" onclick="clOv('upOv')">Nice</button></div>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div class="ov" id="setOv">
+  <div class="set-mc">
+    <div class="mc-tag">Preferences</div>
+    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.06em;margin-bottom:22px">Settings</h2>
+    <div class="set-sec"><div class="set-lbl">Display</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <button class="mus-btn on" id="clkTogBtn" onclick="togCC()">Clock Visible</button>
+        <div class="vol-row" style="min-width:180px"><span class="vol-lbl">BG Dim</span><input type="range" id="dimS" min="0" max="90" value="25" oninput="document.getElementById('bgVid').style.opacity=1-this.value/100"></div>
+      </div>
+    </div>
+    <div class="set-sec"><div class="set-lbl">UI Font</div><div class="font-grid" id="fGrid"></div></div>
+    <div class="set-sec"><div class="set-lbl">Live Wallpaper</div><div class="wp-grid" id="wGrid"></div></div>
+    <div class="set-sec"><div class="set-lbl">Custom Cursor</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap" id="cursorGrid">
+        <div class="cursor-opt on" onclick="setCursor(0)" title="Default">
+          <img src="https://github.com/TafoHubOffical/TafoHub-DONTDMCA-MainTafo-222/raw/refs/heads/main/1-0" onerror="this.style.display='none'">
+          <img src="https://github.com/TafoHubOffical/TafoHub-DONTDMCA-MainTafo-222/raw/refs/heads/main/1-1" onerror="this.style.display='none'">
+        </div>
+        <div class="cursor-opt" onclick="setCursor(1)" title="Cursor 2">
+          <img src="https://github.com/TafoHubOffical/TafoHub-DONTDMCA-MainTafo-222/raw/refs/heads/main/2-0" onerror="this.style.display='none'">
+          <img src="https://github.com/TafoHubOffical/TafoHub-DONTDMCA-MainTafo-222/raw/refs/heads/main/2-2" onerror="this.style.display='none'">
+        </div>
+        <div class="cursor-opt" onclick="setCursor(2)" title="Cursor 3">
+          <img src="https://github.com/TafoHubOffical/TafoHub-DONTDMCA-MainTafo-222/raw/refs/heads/main/3-0" onerror="this.style.display='none'">
+          <img src="https://github.com/TafoHubOffical/TafoHub-DONTDMCA-MainTafo-222/raw/refs/heads/main/3-3" onerror="this.style.display='none'">
+        </div>
+        <div class="cursor-opt" onclick="setCursor(-1)" title="System Default" style="justify-content:center;align-items:center;font-family:'Barlow Condensed',sans-serif;font-size:.6rem;letter-spacing:.1em;color:rgba(180,210,255,.5)">Default</div>
+      </div>
+    </div>
+    <div class="ma"><button class="rb p" onclick="clOv('setOv');stopPrev()">Done</button></div>
+  </div>
+</div>
+
+<!-- ABOUT OVERLAY -->
+<div class="ov" id="aboutOv">
+  <div class="mc">
+    <div class="mc-tag">About</div>
+    <h2>TafoHub</h2>
+    <div style="text-align:center;padding:18px 0 10px">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.55rem;letter-spacing:.14em;color:var(--accent);text-shadow:0 0 28px rgba(126,184,247,.35),0 0 60px rgba(126,184,247,.15);line-height:1.2">This Website Focuses<br>More On LightSpeed</div>
+      <div style="margin-top:14px;width:80px;height:1px;background:linear-gradient(90deg,transparent,rgba(126,184,247,.4),transparent);margin-left:auto;margin-right:auto"></div>
+    </div>
+    <div class="ma" style="margin-top:18px"><button class="rb p" onclick="clOv('aboutOv')">Close</button></div>
+  </div>
+</div>
+
+<!-- OUR SOCIALS OVERLAY -->
+<div class="ov" id="socialsOv">
+  <div class="mc">
+    <div class="mc-tag">TafoHub</div>
+    <h2>Our Socials</h2>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:22px">
+      <div onclick="window.open('https://www.youtube.com/@TafoHubOfficial','_blank')" style="display:flex;align-items:center;gap:14px;background:rgba(255,0,0,.07);border:1px solid rgba(255,0,0,.2);border-radius:4px;padding:14px 18px;cursor:pointer;transition:background .15s" onmouseover="this.style.background='rgba(255,0,0,.14)'" onmouseout="this.style.background='rgba(255,0,0,.07)'">
+        <img src="https://raw.githubusercontent.com/TafoHubOffical/TafoHub-DONTDMCA-MainTafo-222/refs/heads/main/Favicon-TafoHub.png" style="width:36px;height:36px;border-radius:6px;object-fit:cover;flex-shrink:0">
+        <svg width="40" height="28" viewBox="0 0 40 28" fill="none" style="flex-shrink:0"><rect width="40" height="28" rx="7" fill="#FF0000"/><polygon points="16,8 16,20 28,14" fill="#fff"/></svg>
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:.1em;color:#fff">TafoHub Youtube Channel</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:.6rem;letter-spacing:.15em;color:rgba(255,255,255,.3);text-transform:uppercase;margin-top:2px">YouTube</div>
+        </div>
+      </div>
+    </div>
+    <div class="ma"><button class="rb p" onclick="clOv('socialsOv')">Close</button></div>
+  </div>
+</div>
+
+<!-- HELP -->
+<div class="ov" id="ho">
+  <div class="mc"><div class="mc-tag">Support</div><h2>Help</h2>
+    <p>Need help? Visit the official site for guides and support.</p>
+    <div class="ma"><button class="rb" onclick="clOv('ho')">Close</button><button class="rb p" onclick="window.open('https://sites.google.com/view/how-to-be-smarter/home?authuser=0')">Official Site</button></div>
+  </div>
+</div>
+
+<div id="cc"><div class="cc-t" id="ccT">00:00</div><div class="cc-d" id="ccD">Monday</div><div class="cc-m" id="ccM">April 17</div></div>
+<div id="hb" onclick="togHide()"><svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M1 1l9 9M10 1L1 10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><span id="hbT">Hide All</span></div>
+</div>
+
+<script>
+// FONTS
+const fonts=[['Barlow','Barlow'],['Space Grotesk','Space Grotesk'],['Syne','Syne'],['DM Mono','DM Mono'],['Unbounded','Unbounded'],['Instrument Serif','Serif'],['Raleway','Raleway'],['JetBrains Mono','Mono']];
+(()=>{const g=document.getElementById('fGrid');fonts.forEach(([n,l])=>{const d=document.createElement('div');d.className='fo'+(n==='Barlow'?' on':'');d.innerHTML=`<div class="fo-name">${l}</div><div class="fo-prev" style="font-family:'${n}',sans-serif">The quick fox</div>`;d.onclick=()=>{document.documentElement.style.setProperty('--uf',`'${n}',sans-serif`);g.querySelectorAll('.fo').forEach(x=>x.classList.remove('on'));d.classList.add('on')};g.appendChild(d)})})();
+
+// WALLPAPERS
+const wps=['https://github.com/MISTERCOOL27277/873637373737377/raw/refs/heads/main/yuta-jujutsu-kaisen.960x540.mp4','https://github.com/MISTERCOOL27277/873637373737377/raw/refs/heads/main/berserk-blood-shadow.960x540.mp4','https://github.com/MISTERCOOL27277/873637373737377/raw/refs/heads/main/minecraft-relaxing-fireplace.960x540.mp4','https://github.com/MISTERCOOL27277/873637373737377/raw/refs/heads/main/minecraft-snowy-campfire.960x540.mp4','https://github.com/MISTERCOOL27277/873637373737377/raw/refs/heads/main/rainy-evening-minecraft.960x540.mp4','https://github.com/MISTERCOOL27277/873637373737377/raw/refs/heads/main/straw-hat-luffy.960x540.mp4','https://github.com/MISTERCOOL27277/873637373737377/raw/refs/heads/main/sukuna-fire-arrow.960x540.mp4','https://github.com/MISTERCOOL27277/873637373737377/raw/refs/heads/main/hunt-showdown-veil-of-thorns.960x540.mp4'];
+const pvs=[];
+(()=>{const g=document.getElementById('wGrid');wps.forEach((s,i)=>{const d=document.createElement('div');d.className='wp'+(i===0?' on':'');const v=document.createElement('video');v.src=s;v.muted=true;v.loop=true;v.playsInline=true;v.preload='metadata';d.appendChild(v);pvs.push(v);d.onclick=()=>{const bv=document.getElementById('bgVid');bv.src=s;bv.load();bv.play().catch(()=>{});g.querySelectorAll('.wp').forEach(x=>x.classList.remove('on'));d.classList.add('on')};g.appendChild(d)})})();
+function stopPrev(){pvs.forEach(v=>{v.pause();v.currentTime=0})}
+
+// OVERLAYS
+function shOv(id){document.getElementById(id).classList.add('active');if(id==='setOv')pvs.forEach(v=>v.play().catch(()=>{}))}
+function clOv(id){document.getElementById(id).classList.remove('active')}
+document.querySelectorAll('.ov').forEach(o=>o.addEventListener('click',function(e){if(e.target===this){this.classList.remove('active');if(this.id==='setOv')stopPrev()}}));
+
+// EMBED WINDOWS
+let ewHz=600;
+
+// Auto-update scripts provided for shows & movies — wrap in blob so fetch runs same-origin
+const autoUpdateScripts={
+  showsWin:`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>*{margin:0;padding:0}html,body{width:100%;height:100%;overflow:hidden}</style></head><body><script>
+async function launch(){
+  try{
+    const res=await fetch("https://cdn.jsdelivr.net/gh/TafoHubOffical/TafoHub-DONTDMCA-Shows-222@main/Tafo-Shows-Single.File.html?t="+Date.now());
+    const html=await res.text();
+    document.open();document.write(html);document.close();
+  }catch(e){document.body.innerHTML='<p style="color:#f99;font-family:sans-serif;padding:20px">Failed to load shows.</p>';}
+}
+launch();
+<\/script></body></html>`,
+  moviesWin:`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>*{margin:0;padding:0}html,body{width:100%;height:100%;overflow:hidden}</style></head><body><script>
+async function launch(){
+  try{
+    const res=await fetch("https://cdn.jsdelivr.net/gh/TafoHubOffical/TafoHub-DONTDMCA-Movies2222@main/tafo-singlefile.movies.html?t="+Date.now());
+    const html=await res.text();
+    document.open();document.write(html);document.close();
+  }catch(e){document.body.innerHTML='<p style="color:#f99;font-family:sans-serif;padding:20px">Failed to load movies.</p>';}
+}
+launch();
+<\/script></body></html>`
+};
+
+function openEmbedWin(winId,frameId,url){
+  const fr=document.getElementById(frameId);
+  const w=document.getElementById(winId);
+  if(autoUpdateScripts[winId]){
+    // Use blob wrapper so the fetch inside runs same-origin, bypassing X-Frame-Options
+    const blob=new Blob([autoUpdateScripts[winId]],{type:'text/html;charset=utf-8'});
+    fr.src=URL.createObjectURL(blob);
+  } else {
+    // For others, fetch HTML and blob it so X-Frame-Options can't block
+    fetch(url+'?t='+Date.now()).then(r=>r.text()).then(html=>{
+      fr.src=URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'}));
+    }).catch(()=>{fr.src=url;});
+  }
+  w.style.display='flex';w.style.zIndex=++ewHz;
+  w.classList.remove('opening');void w.offsetWidth;w.classList.add('opening');
+}
+function clEmbedWin(winId){
+  const w=document.getElementById(winId);
+  w.style.transition='opacity .18s,transform .18s';w.style.opacity='0';w.style.transform='scale(.95)';
+  setTimeout(()=>{w.style.display='none';w.style.opacity='';w.style.transform='';w.style.transition=''},180);
+}
+// drag embed windows
+['showsWin','moviesWin','gamesWin','proxiesWin','callWin'].forEach(winId=>{
+  const win=document.getElementById(winId);
+  const h=win.querySelector('.embed-wh');
+  if(!h)return;
+  let ox,oy,dr=false;
+  h.addEventListener('mousedown',e=>{if(e.target.classList.contains('wb'))return;dr=true;win.style.zIndex=++ewHz;const r=win.getBoundingClientRect();ox=e.clientX-r.left;oy=e.clientY-r.top;e.preventDefault()});
+  document.addEventListener('mousemove',e=>{if(!dr)return;win.style.left=(e.clientX-ox)+'px';win.style.top=(e.clientY-oy)+'px';win.style.right='auto';win.style.bottom='auto'});
+  document.addEventListener('mouseup',()=>dr=false);
+});
+
+// CLOCK TOGGLE
+let ccVis=true;
+function togCC(){ccVis=!ccVis;document.getElementById('cc').classList.toggle('cc-hide',!ccVis);const b=document.getElementById('clkTogBtn');b.textContent=ccVis?'Clock Visible':'Clock Hidden';b.classList.toggle('on',ccVis)}
+
+// WINDOWS + drag
+let hz=500;const ow=new Set();
+const wm={tw:{l:'Tools',s:'<svg viewBox="0 0 20 20" fill="none"><path d="M3 17L9.5 10.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M9.5 10.5L11 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M11 9C11.6 6.8 13.8 5.5 16 6.2C14.8 6.2 13.5 7.4 13.8 8.8C14.1 10.2 15.6 10.8 16.6 9.8C15.6 12 13.5 12.8 11.5 12L11 9Z" fill="currentColor"/><circle cx="4" cy="16" r="1.3" fill="currentColor" opacity=".6"/></svg>'},nw:{l:'Notes',s:'<svg viewBox="0 0 20 20" fill="none"><rect x="3" y="2" width="14" height="16" rx="2" stroke="currentColor" stroke-width="1.5"/><line x1="6" y1="7" x2="14" y2="7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="6" y1="10.5" x2="14" y2="10.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="6" y1="14" x2="11" y2="14" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>'}};
+function opWin(id){const w=document.getElementById(id);w.style.display='flex';w.style.zIndex=++hz;w.classList.remove('opening');void w.offsetWidth;w.classList.add('opening');ow.add(id);uTP()}
+function clWin(id){const w=document.getElementById(id);w.style.transition='opacity .18s,transform .18s';w.style.opacity='0';w.style.transform='scale(.95)';setTimeout(()=>{w.style.display='none';w.style.opacity='';w.style.transform='';w.style.transition=''},180);ow.delete(id);uTP()}
+function uTP(){document.getElementById('tpm').innerHTML=[...ow].map(id=>`<div class="tp active" onclick="document.getElementById('${id}').style.zIndex=++hz" title="${wm[id]?.l||id}">${wm[id]?.s||'&#9633;'}</div>`).join('')}
+document.querySelectorAll('.win').forEach(win=>{const h=win.querySelector('.wh');if(!h)return;let ox,oy,dr=false;h.addEventListener('mousedown',e=>{if(e.target.classList.contains('wb'))return;dr=true;win.style.zIndex=++hz;const r=win.getBoundingClientRect();ox=e.clientX-r.left;oy=e.clientY-r.top;e.preventDefault()});document.addEventListener('mousemove',e=>{if(!dr)return;win.style.left=(e.clientX-ox)+'px';win.style.top=(e.clientY-oy)+'px';win.style.right='auto';win.style.bottom='auto'});document.addEventListener('mouseup',()=>dr=false)});
+
+// FULLSCREEN — uses native browser fullscreen on the iframe so content fills the whole screen
+function fsEmbedWin(winId){
+  const frameMap={showsWin:'showsFrame',moviesWin:'moviesFrame',gamesWin:'gamesFrame',proxiesWin:'proxiesFrame',callWin:'callFrame',tw:'tw',nw:'nw'};
+  const fr=document.getElementById(frameMap[winId]);
+  if(!fr)return;
+  const el=fr.tagName==='IFRAME'?fr:document.getElementById(winId);
+  if(el.requestFullscreen)el.requestFullscreen();
+  else if(el.webkitRequestFullscreen)el.webkitRequestFullscreen();
+  else if(el.mozRequestFullScreen)el.mozRequestFullScreen();
+}
+
+// Also keep window-level expand for .win windows
+const winFSState={};
+const winFSPrev={};
+function toggleWinFS(winId){
+  const w=document.getElementById(winId);
+  const expanded=winFSState[winId];
+  if(!expanded){
+    winFSPrev[winId]={top:w.style.top,left:w.style.left,width:w.style.width,height:w.style.height};
+    w.style.top='0';w.style.left='0';w.style.width='100vw';w.style.height='calc(100vh - var(--th))';w.style.borderRadius='0';w.style.right='auto';w.style.bottom='auto';
+    winFSState[winId]=true;
+  } else {
+    const p=winFSPrev[winId]||{};
+    w.style.top=p.top||'5%';w.style.left=p.left||'5%';w.style.width=p.width||'75%';w.style.height=p.height||'80%';w.style.borderRadius='';
+    winFSState[winId]=false;
+  }
+}
+
+// TABS
+function swTab(n){const ns=['html','calc','trans','json','b64','clr'];document.querySelectorAll('.ttab').forEach((t,i)=>t.classList.toggle('on',ns[i]===n));document.querySelectorAll('.tpane').forEach(p=>p.classList.remove('on'));document.getElementById('pane-'+n).classList.add('on')}
+
+// HTML VIEWER multi-tab
+let htmlTabs=[{id:0,name:'Tab 1',content:''}],htmlActiveTab=0,htmlTabCounter=1;
+function getCe(){return document.getElementById('ce')}
+function renderHtmlTabs(){
+  const bar=document.getElementById('html-tabs');
+  bar.innerHTML='';
+  htmlTabs.forEach(tab=>{
+    const d=document.createElement('div');
+    d.style.cssText='display:flex;align-items:center;gap:5px;padding:6px 12px;cursor:pointer;font-family:\'Barlow Condensed\',sans-serif;font-size:.63rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;border-right:1px solid rgba(126,184,247,.08);flex-shrink:0;transition:all .15s;color:'+(tab.id===htmlActiveTab?'rgba(255,255,255,.9)':'rgba(255,255,255,.3)')+';background:'+(tab.id===htmlActiveTab?'rgba(126,184,247,.07)':'transparent')+';border-bottom:'+(tab.id===htmlActiveTab?'2px solid var(--accent)':'2px solid transparent');
+    const nm=document.createElement('span');nm.textContent=tab.name;d.appendChild(nm);
+    d.onclick=()=>switchHtmlTab(tab.id);
+    if(htmlTabs.length>1){const x=document.createElement('span');x.textContent='×';x.style.cssText='opacity:.4;font-size:.8rem;margin-left:3px;line-height:1;cursor:pointer';x.onclick=e=>{e.stopPropagation();closeHtmlTab(tab.id)};d.appendChild(x)}
+    bar.appendChild(d);
+  });
+}
+function switchHtmlTab(id){
+  const cur=htmlTabs.find(t=>t.id===htmlActiveTab);if(cur)cur.content=getCe().value;
+  htmlActiveTab=id;const tab=htmlTabs.find(t=>t.id===id);
+  getCe().value=tab?tab.content:'';updL();renderHtmlTabs();
+}
+function newHtmlTab(){
+  const cur=htmlTabs.find(t=>t.id===htmlActiveTab);if(cur)cur.content=getCe().value;
+  htmlTabCounter++;const nt={id:Date.now(),name:'Tab '+htmlTabCounter,content:''};
+  htmlTabs.push(nt);switchHtmlTab(nt.id);
+}
+function closeHtmlTab(id){
+  if(htmlTabs.length===1)return;const idx=htmlTabs.findIndex(t=>t.id===id);htmlTabs.splice(idx,1);
+  if(htmlActiveTab===id){const ni=htmlTabs[Math.min(idx,htmlTabs.length-1)];switchHtmlTab(ni.id)}else renderHtmlTabs();
+}
+function copyHtml(){
+  const txt=getCe().value;if(!txt)return;
+  if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(txt).catch(()=>fallbackCopy(txt))}else{fallbackCopy(txt)}
+}
+function fallbackCopy(txt){
+  const ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='position:fixed;top:-9999px;left:-9999px;opacity:0';
+  document.body.appendChild(ta);ta.focus();ta.select();try{document.execCommand('copy')}catch(e){}document.body.removeChild(ta);
+}
+function updL(){
+  const t=getCe(),l=document.getElementById('ln'),lc=document.getElementById('lc');
+  const n=Math.max(1,t.value.split('\n').length);
+  const next=Array.from({length:n},(_,i)=>i+1).join('\n');
+  if(l.textContent!==next)l.textContent=next;
+  lc.textContent=n+' line'+(n===1?'':'s');
+}
+getCe().addEventListener('input',updL);
+getCe().addEventListener('scroll',function(){document.getElementById('ln').scrollTop=this.scrollTop});
+renderHtmlTabs();updL();
+
+function runHtml(){
+  const code=getCe().value;if(!code.trim())return;
+  const blob=new Blob([code],{type:'text/html;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const w=window.open(url,'_blank');
+  if(w)w.addEventListener('load',()=>setTimeout(()=>URL.revokeObjectURL(url),1000));else URL.revokeObjectURL(url);
+}
+function dlHtml(){
+  const code=getCe().value;if(!code.trim())return;
+  const blob=new Blob([code],{type:'text/html;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='tafohub-export.html';a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+function ulHtml(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();reader.onload=e=>{getCe().value=e.target.result;updL()};
+  reader.readAsText(file);input.value='';
+}
+
+// TASKBAR RIPPLE
+function tbC(el,url){const rp=document.createElement('div');rp.className='rp';const s=Math.max(el.offsetWidth,el.offsetHeight)*2;rp.style.cssText=`width:${s}px;height:${s}px;left:${el.offsetWidth/2-s/2}px;top:${el.offsetHeight/2-s/2}px`;el.appendChild(rp);setTimeout(()=>rp.remove(),500);setTimeout(()=>window.open(url,'_blank'),120)}
+
+// CALCULATOR
+let cC='0',cP='',cO=null,cF=false;
+function cD(){const v=document.getElementById('cV');v.textContent=cC;v.classList.remove('pop');void v.offsetWidth;v.classList.add('pop');document.getElementById('cE').textContent=cP+(cO?' '+{'/':'÷','*':'×','-':'−','+':'+'}[cO]:'')}
+function cN(n){if(cC.length>14&&!cF)return;cF?(cC=n,cF=false):(cC=cC==='0'?n:cC+n);cD()}
+function cDot(){if(cF){cC='0.';cF=false;cD();return}if(!cC.includes('.'))cC+='.';cD()}
+function cOp(o){if(cO&&!cF){const r=cmp();cP=r;cC=String(r)}else cP=cC;cO=o;cF=true;cD()}
+function cmp(){const a=parseFloat(cP),b=parseFloat(cC);if(cO==='/')return b===0?'Err':a/b;if(cO==='*')return a*b;if(cO==='-')return a-b;return a+b}
+function cEq(){if(!cO)return;const r=cmp();const ex=cP+' '+{'/':'÷','*':'×','-':'−','+':'+'}[cO]+' '+cC+' =';cC=r==='Err'?'Err':String(parseFloat(r.toFixed(10)));cP='';cO=null;cF=true;document.getElementById('cE').textContent=ex;document.getElementById('cV').textContent=cC}
+function cAC(){cC='0';cP='';cO=null;cF=false;cD()}
+function cSgn(){cC=String(parseFloat(cC)*-1);cD()}
+function cPct(){cC=String(parseFloat(cC)/100);cD()}
+
+// TRANSLATOR
+const tIn=document.getElementById('tIn'),tOut=document.getElementById('tOut'),tSt=document.getElementById('tSt');
+async function doTrans(){const txt=tIn.value.trim();if(!txt)return;const f=document.getElementById('tF').value,t=document.getElementById('tT').value;tSt.textContent='...';tOut.value='';try{const lp=f==='auto'?t:f+'|'+t;const r=await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(txt)}&langpair=${lp}&de=tafohub@app`);const d=await r.json();tOut.value=d.responseStatus===200?d.responseData.translatedText:'Error';tSt.textContent='Done'}catch{tSt.textContent='Error'}setTimeout(()=>tSt.textContent='',3000)}
+function swapL(){const f=document.getElementById('tF'),t=document.getElementById('tT');const fv=f.value==='auto'?'en':f.value,tv=t.value;f.value=tv;t.value=fv;const tmp=tIn.value;tIn.value=tOut.value;tOut.value=tmp}
+tIn.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();doTrans()}});
+
+// JSON FORMATTER
+function fmtJson(){const el=document.getElementById('jOut');try{el.value=JSON.stringify(JSON.parse(document.getElementById('jIn').value),null,2);el.className='tool-ta out'}catch(e){el.value='Error: '+e.message;el.className='tool-ta err'}}
+function minJson(){const el=document.getElementById('jOut');try{el.value=JSON.stringify(JSON.parse(document.getElementById('jIn').value));el.className='tool-ta out'}catch(e){el.value='Error: '+e.message;el.className='tool-ta err'}}
+
+// BASE64
+function doEnc(){const o=document.getElementById('b64Out');try{o.value=btoa(unescape(encodeURIComponent(document.getElementById('b64In').value)));o.className='tool-ta out'}catch(e){o.value='Error encoding';o.className='tool-ta err'}}
+function doDec(){const o=document.getElementById('b64Out');try{o.value=decodeURIComponent(escape(atob(document.getElementById('b64In').value)));o.className='tool-ta out'}catch(e){o.value='Error: invalid Base64';o.className='tool-ta err'}}
+
+// COLOR PICKER
+function hexToRgb(h){const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);return{r,g,b}}
+function rgbToHsl(r,g,b){r/=255;g/=255;b/=255;const mx=Math.max(r,g,b),mn=Math.min(r,g,b);let h,s,l=(mx+mn)/2;if(mx===mn){h=s=0}else{const d=mx-mn;s=l>.5?d/(2-mx-mn):d/(mx+mn);switch(mx){case r:h=((g-b)/d+(g<b?6:0))/6;break;case g:h=((b-r)/d+2)/6;break;default:h=((r-g)/d+4)/6}}return{h:Math.round(h*360),s:Math.round(s*100),l:Math.round(l*100)}}
+function updColor(hex){document.getElementById('colorDisp').style.background=hex;document.getElementById('colorHex').textContent=hex;const{r,g,b}=hexToRgb(hex);document.getElementById('colorRgb').textContent=`rgb(${r}, ${g}, ${b})`;const{h,s,l}=rgbToHsl(r,g,b);document.getElementById('colorHsl').textContent=`hsl(${h}, ${s}%, ${l}%)`}
+
+// NOTES AUTOSAVE
+const na=document.getElementById('noteArea');
+na.value=localStorage.getItem('tafohub-notes')||'';
+na.addEventListener('input',()=>localStorage.setItem('tafohub-notes',na.value));
+
+// CALENDAR
+let cY,cM;
+function tgCal(){
+  const c=document.getElementById('cw');const open=c.style.display==='flex';
+  if(open){c.style.opacity='0';c.style.transform='translateY(8px) scale(.97)';setTimeout(()=>{c.style.display='none';c.style.opacity='';c.style.transform=''},180)}
+  else{
+    const btn=document.querySelector('.cb');const r=btn.getBoundingClientRect();
+    c.style.display='flex';c.style.visibility='hidden';
+    c.style.visibility='';
+    c.style.right=(window.innerWidth-r.right)+'px';
+    c.style.bottom=(window.innerHeight-r.top+8)+'px';
+    c.style.left='auto';c.style.top='auto';
+    c.classList.remove('open');void c.offsetWidth;c.classList.add('open');
+    const n=new Date();cY=n.getFullYear();cM=n.getMonth();bCal();
+  }
+}
+function calNav(d){cM+=d;if(cM<0){cM=11;cY--}if(cM>11){cM=0;cY++}bCal()}
+function bCal(){const t=new Date(),ty=t.getFullYear(),tm=t.getMonth(),td=t.getDate(),g=document.getElementById('calG');document.getElementById('calM').textContent=new Date(cY,cM,1).toLocaleString('default',{month:'long'}).toUpperCase()+' '+cY;g.innerHTML='SMTWTFS'.split('').map(d=>`<div class="dl">${d}</div>`).join('');const fd=new Date(cY,cM,1).getDay(),dm=new Date(cY,cM+1,0).getDate(),pd=new Date(cY,cM,0).getDate();for(let i=0;i<fd;i++){const v=document.createElement('div');v.className='cd om';v.textContent=pd-fd+1+i;g.appendChild(v)}for(let i=1;i<=dm;i++){const v=document.createElement('div');v.className='cd';v.textContent=i;if(i===td&&cM===tm&&cY===ty)v.classList.add('today');g.appendChild(v)}const rem=(7-(fd+dm)%7)%7;for(let i=1;i<=rem;i++){const v=document.createElement('div');v.className='cd om';v.textContent=i;g.appendChild(v)}}
+
+// CLOCK + BATTERY
+const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+function uClk(){
+  const n=new Date();
+  document.getElementById('clk').textContent=n.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true});
+  document.getElementById('dt').textContent=n.toLocaleDateString();
+  document.getElementById('ccT').textContent=n.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',hour12:true});
+  document.getElementById('ccD').textContent=days[n.getDay()];
+  document.getElementById('ccM').textContent=months[n.getMonth()]+' '+n.getDate();
+}
+uClk();setInterval(uClk,1000);
+
+function batColor(l){if(l<=20)return'#ff5f57';if(l<=50)return'#ffbd2e';return'#34c759'}
+if(navigator.getBattery){
+  navigator.getBattery().then(b=>{
+    function updBat(){
+      const l=Math.floor(b.level*100);
+      const bt=document.getElementById('bt'),bl=document.getElementById('bl'),chg=document.getElementById('btChg');
+      const c=batColor(l);bt.textContent=l+'%';bt.style.color=c;bt.style.opacity='1';bl.style.width=l+'%';bl.style.background=c;
+      chg.style.display=(b.charging&&l<100)?'inline-flex':'none';
+    }
+    updBat();b.addEventListener('levelchange',updBat);b.addEventListener('chargingchange',updBat);
+  }).catch(()=>{});
+}else{document.getElementById('bt').textContent='';document.getElementById('bs').style.display='none';}
+
+// CUSTOM CURSOR
+const cursors=[
+  {def:'https://github.com/TafoHubOffical/TafoHub-DONTDMCA-MainTafo-222/raw/refs/heads/main/1-0',ptr:'https://github.com/TafoHubOffical/TafoHub-DONTDMCA-MainTafo-222/raw/refs/heads/main/1-1'},
+  {def:'https://github.com/TafoHubOffical/TafoHub-DONTDMCA-MainTafo-222/raw/refs/heads/main/2-0',ptr:'https://github.com/TafoHubOffical/TafoHub-DONTDMCA-MainTafo-222/raw/refs/heads/main/2-2'},
+  {def:'https://github.com/TafoHubOffical/TafoHub-DONTDMCA-MainTafo-222/raw/refs/heads/main/3-0',ptr:'https://github.com/TafoHubOffical/TafoHub-DONTDMCA-MainTafo-222/raw/refs/heads/main/3-3'}
+];
+let cursorStyle=document.createElement('style');
+cursorStyle.id='cursorStyle';
+document.head.appendChild(cursorStyle);
+function setCursor(idx){
+  document.querySelectorAll('.cursor-opt').forEach((el,i)=>el.classList.toggle('on',i===idx||(idx===-1&&i===3)));
+  if(idx===-1){cursorStyle.textContent='';return;}
+  const c=cursors[idx];
+  cursorStyle.textContent=`*{cursor:url('${c.def}'),auto!important}a,button,.rb,.ck,.tp,.tb-site,.sc,.gp,.wb,.cursor-opt,.media-card,.fo,.wp,.cd,.mus-btn,.cb,.swap-btn,.color-val,[onclick]{cursor:url('${c.ptr}'),pointer!important}`;
+}
+
+// HIDE ALL
+let hidden=false;
+function togHide(){hidden=!hidden;const m=document.getElementById('main'),b=document.getElementById('hb'),t=document.getElementById('hbT');if(hidden){m.classList.add('ui-hidden');b.classList.add('sm');t.textContent='Show All'}else{m.classList.remove('ui-hidden');b.classList.remove('sm');t.textContent='Hide All'}}
+</script></body></html>
